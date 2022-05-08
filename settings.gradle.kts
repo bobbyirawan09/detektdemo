@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "detekt demo"
-include ':app'
+include(":app")
