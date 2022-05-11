@@ -18,60 +18,68 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.20.0"
 }
 
-//(Optional) Step 2, Detekt closure configuration
-detekt {
-    // Version of Detekt that will be used. When unspecified the latest detekt
-    // version found will be used. Override to stay on the same version.
-    toolVersion = "1.20.0"
+allprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt") // Version should be inherited from parent
 
-    // The directories where detekt looks for source files.
-    // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
-    source = files("src/main/java", "src/main/kotlin")
+    //(Optional) Step 2, Detekt closure configuration
+    detekt {
+        // Version of Detekt that will be used. When unspecified the latest detekt
+        // version found will be used. Override to stay on the same version.
+        toolVersion = "1.20.0"
 
-    // Builds the AST in parallel. Rules are always executed in parallel.
-    // Can lead to speedups in larger projects. `false` by default.
-    parallel = false
+        // The directories where detekt looks for source files.
+        // Defaults to `files("src/main/java", "src/test/java", "src/main/kotlin", "src/test/kotlin")`.
+        source = files("src/main/java", "src/main/kotlin")
 
-    // Define the detekt configuration(s) you want to use.
-    // Defaults to the default detekt configuration.
-    config = files("${project.rootDir}/detekt/config/config.yml")
+        // Builds the AST in parallel. Rules are always executed in parallel.
+        // Can lead to speedups in larger projects. `false` by default.
+        parallel = false
 
-    // Applies the config files on top of detekt's default config file. `false` by default.
-    buildUponDefaultConfig = false
+        // Define the detekt configuration(s) you want to use.
+        // Defaults to the default detekt configuration.
+        config = files("${project.rootDir}/detekt/config/config.yml")
 
-    // Turns on all the rules. `false` by default.
-    allRules = false
+        // Applies the config files on top of detekt's default config file. `false` by default.
+        buildUponDefaultConfig = true
 
-    // Specifying a baseline file. All findings stored in this file in subsequent runs of detekt.
-    baseline = file("${project.rootDir}/detekt/config/baseline.xml")
+        // Turns on all the rules. `false` by default.
+        allRules = false
 
-    // Disables all default detekt rulesets and will only run detekt with custom rules
-    // defined in plugins passed in with `detektPlugins` configuration. `false` by default.
-    disableDefaultRuleSets = false
+        // Specifying a baseline file. All findings stored in this file in subsequent runs of detekt.
+        baseline = file("${project.rootDir}/detekt/config/baseline.xml")
 
-    // Adds debug output during task execution. `false` by default.
-    debug = false
+        // Disables all default detekt rulesets and will only run detekt with custom rules
+        // defined in plugins passed in with `detektPlugins` configuration. `false` by default.
+        disableDefaultRuleSets = false
 
-    // If set to `true` the build does not fail when the
-    // maxIssues count was reached. Defaults to `false`.
-    ignoreFailures = false
+        // Adds debug output during task execution. `false` by default.
+        debug = false
 
-    // Android: Don't create tasks for the specified build types (e.g. "release")
-    ignoredBuildTypes = listOf("release")
+        // If set to `true` the build does not fail when the
+        // maxIssues count was reached. Defaults to `false`.
+        ignoreFailures = true
 
-    // Android: Don't create tasks for the specified build flavor (e.g. "production")
-    ignoredFlavors = listOf("production")
+        // Android: Don't create tasks for the specified build types (e.g. "release")
+        ignoredBuildTypes = listOf("release")
 
-    // Android: Don't create tasks for the specified build variants (e.g. "productionRelease")
-    ignoredVariants = listOf("productionRelease")
+        // Android: Don't create tasks for the specified build flavor (e.g. "production")
+        ignoredFlavors = listOf("production")
 
-    //(Optional) Step 4, set up report directory and file type
-    reports {
-        html.required.set(true) // observe findings in your browser with structure and code snippets
-        html.outputLocation.set(file("${project.rootDir}/detekt/reports/detekt.html"))
-        xml.required.set(false) // checkstyle like format mainly for integrations like Jenkins
-        txt.required.set(false) // similar to the console output, contains issue signature to manually edit baseline files
-        sarif.required.set(false) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with Github Code Scanning
+        // Android: Don't create tasks for the specified build variants (e.g. "productionRelease")
+        ignoredVariants = listOf("productionRelease")
+
+        basePath = "${project.rootDir}/detekt/reports"
+    }
+
+    //(Optional) Step 3, set up report directory and file type
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        reports {
+            html.required.set(true) // observe findings in your browser with structure and code snippets
+            html.outputLocation.set(file("${project.rootDir}/detekt/reports/detekt.html"))
+            xml.required.set(false) // checkstyle like format mainly for integrations like Jenkins
+            txt.required.set(false) // similar to the console output, contains issue signature to manually edit baseline files
+            sarif.required.set(false) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with Github Code Scanning
+        }
     }
 }
 
